@@ -7,20 +7,70 @@
         display: block;
       }
     </style>
-    <h2>Hello [[prop1]]</h2>
+    <iron-ajax id="ajaxNames"
+      auto
+      url="names.json"
+      handle-as="json"
+      on-response="handleResponse"></iron-ajax>
+    <paper-input id="nameStart" label="Inizia per" on-keyup="onChangeHandler"></paper-input>
+    <paper-input id="nameContain" label="Contiene" on-keyup="onChangeContainHandler"></paper-input>
+    <paper-listbox>
+      <template is="dom-repeat" items="[[filteredNames]]">
+        <paper-item>[[item]]</paper-item>
+      </template>
+    </paper-listbox>
   </template>
 
   <script>
+    let namesResult = [];
+    let filterStart = '';
+    let filterContain = '';
+
     Polymer({
 
       is: 'child-name-app',
 
       properties: {
-        prop1: {
-          type: String,
-          value: 'child-name-app',
-        },
+        filteredNames: {
+          type: Array
+        }
       },
+
+      onChangeHandler: function(event) {
+        // console.log(this.$.nameStart.value);
+        // console.log(event.srcElement.value);
+        filterStart = '';
+        if (event.srcElement.value != '' || filterContain != '') {
+          filterStart = '^' + event.srcElement.value;
+          const result = namesResult.names.filter(item => {
+            let filter = filterStart + filterContain;
+            let regEx = new RegExp(filter, 'gi');
+            return regEx.test(item);
+          });
+          this.filteredNames = result;
+        } else {
+          this.filteredNames = [];
+        }
+      },
+
+      onChangeContainHandler: function(event) {
+        filterContain = '';
+        if (event.srcElement.value != '' || filterStart != '') {
+          filterContain = '.*' + event.srcElement.value;
+          let filter = filterStart + filterContain;
+          const result = namesResult.names.filter(item => {
+            let regEx = new RegExp(filter, 'gi');
+            return regEx.test(item);
+          });
+          this.filteredNames = result;
+        } else {
+          this.filteredNames = [];
+        }
+      },
+
+      handleResponse: function(event, element) {
+        namesResult = this.$.ajaxNames.lastResponse;
+      }
 
     });
   </script>
