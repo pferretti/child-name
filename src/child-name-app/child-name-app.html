@@ -4,8 +4,14 @@
   <template>
     <style>:host{display:block;}</style>
     <iron-ajax id="ajaxNames" auto="" url="names.json" handle-as="json" on-response="handleResponse"></iron-ajax>
-    <paper-input id="nameStart" label="Inizia per" on-keyup="onChangeHandler"></paper-input>
-    <paper-input id="nameContain" label="Contiene" on-keyup="onChangeContainHandler"></paper-input>
+    <paper-input id="nameStart" label="Inizia per" on-keyup="onChangeHandler">
+      <paper-icon-button suffix="" on-click="clearNameStart" icon="clear" alt="clear" title="clear">
+      </paper-icon-button>
+    </paper-input>
+    <paper-input id="nameContain" label="Contiene" on-keyup="onChangeContainHandler">
+      <paper-icon-button suffix="" on-click="clearNameContain" icon="clear" alt="clear" title="clear">
+      </paper-icon-button>
+    </paper-input>
     <paper-listbox>
       <template is="dom-repeat" items="[[filteredNames]]">
         <paper-item>[[item]]</paper-item>
@@ -28,15 +34,15 @@
         }
       },
 
-      onChangeHandler: function(event) {
+      handleNameStart: function() {
         filterStart = '';
 
-        if (event.srcElement.value === '' && filterContain === '') {
+        if (this.$.nameStart.value === '' && filterContain === '') {
           this.filteredNames = [];
           return;
         }
 
-        filterStart = event.srcElement.value;
+        filterStart = this.$.nameStart.value;
         const result = namesResult.names.filter(item => {
           const filter = '^' + filterStart + '.*' + filterContain;
           const regEx = new RegExp(filter, 'gi');
@@ -45,21 +51,38 @@
         this.filteredNames = result;
       },
 
-      onChangeContainHandler: function(event) {
+      handleNameContain: function() {
         filterContain = '';
 
-        if (event.srcElement.value === '' && filterStart === '') {
+        if (this.$.nameContain.value === '' && filterStart === '') {
           this.filteredNames = [];
           return;
         }
 
-        filterContain = event.srcElement.value;
+        filterContain = this.$.nameContain.value;
         const filter = '^' + filterStart + '.*' + filterContain;
         const result = namesResult.names.filter(item => {
           const regEx = new RegExp(filter, 'gi');
           return regEx.test(item);
         });
         this.filteredNames = result;
+      },
+
+      onChangeHandler: function(event) {
+        this.handleNameStart();
+      },
+
+      onChangeContainHandler: function(event) {
+        this.handleNameContain();
+      },
+
+      clearNameStart: function(event) {
+        this.$.nameStart.value = '';
+        this.handleNameStart();
+      },
+      clearNameContain: function(event) {
+        this.$.nameContain.value = '';
+        this.handleNameContain();
       },
 
       handleResponse: function(event, element) {
