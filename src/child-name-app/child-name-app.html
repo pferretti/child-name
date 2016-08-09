@@ -43,9 +43,9 @@
         }
 
         filterStart = this.$.nameStart.value;
+        const filter = '^' + filterStart + '.*' + filterContain;
+        const regEx = new RegExp(filter, 'gi');
         const result = namesResult.names.filter(item => {
-          const filter = '^' + filterStart + '.*' + filterContain;
-          const regEx = new RegExp(filter, 'gi');
           return regEx.test(item);
         });
         this.filteredNames = result;
@@ -61,8 +61,8 @@
 
         filterContain = this.$.nameContain.value;
         const filter = '^' + filterStart + '.*' + filterContain;
+        const regEx = new RegExp(filter, 'gi');
         const result = namesResult.names.filter(item => {
-          const regEx = new RegExp(filter, 'gi');
           return regEx.test(item);
         });
         this.filteredNames = result;
